@@ -12,7 +12,6 @@ extends CharacterBody2D
 @onready var marker: Marker2D = $Marker2D
 @onready var rebound_cooldown: Timer = $Timer/rebound_cooldown
 var die: bool = false
-# 粒子场景：请确保 particle.tscn 里的 Angle Min/Max 已设为 0-360
 var hit_particle_scene = preload("res://Scenes/Objects/particle.tscn")
 
 var is_player_right: bool = true
@@ -25,15 +24,14 @@ var is_moving: bool = false
 var jump_count: int = 0  
 var was_in_air: bool = false 
 var can_fire: bool = true
-var can_sp: bool = true # 新增：特殊攻击冷却状态
+var can_sp: bool = true 
 var has_attack_fired: bool = false
-var has_sp_attack_fired: bool = false # 特殊攻击发射标记
+var has_sp_attack_fired: bool = false 
 
 var guard: bool = false
 var rebound: bool = false
 
 @onready var audio_stream_player: AudioStreamPlayer = $AudioStreamPlayer
-
 
 # --- 信号 ---
 signal fire(fire_pos: Vector2, fire_direction: Vector2)
@@ -46,7 +44,7 @@ func _ready() -> void:
 	marker_base_offset_x = abs(marker.position.x)
 
 func _physics_process(delta: float) -> void:
-	# --- 0. 死亡拦截：死亡后不接受任何输入 ---
+	# --- 0. 死亡拦截 ---
 	if health <= 0:
 		die = true
 		velocity.x = 0
@@ -57,39 +55,38 @@ func _physics_process(delta: float) -> void:
 			sprite.play("die")
 		elif not sprite.is_playing():
 			player_right_died.emit()
-			set_physics_process(false) # 彻底停止物理处理
+			set_physics_process(false) 
 			
 		move_and_slide()
-		return # 直接返回，拦截所有后续镜像、攻击、移动检测逻辑
+		return 
 
-	# --- 新增：特殊攻击拦截逻辑 ---
+	# --- 1. 特殊攻击拦截逻辑 ---
 	var is_sp_attacking = sprite.animation == "sp_attack" and sprite.is_playing()
 	if is_sp_attacking:
-		# 即使在特殊攻击中也需要处理重力和镜像同步，但拦截所有动作输入
 		if not is_on_floor():
 			velocity += get_gravity() * delta
-			velocity.y *= 0.5 # 特殊攻击时重力减缓
+			velocity.y *= 0.5 
 		else:
 			velocity.x = 0
 		
-		check_attack_frames() # 允许发射信号
+		check_attack_frames() 
 		move_and_slide()
-		return # 拦截后续的移动、跳跃、攻击指令输入
+		return 
 
-	# 1. 镜像处理
+	# 2. 镜像处理
 	if sprite.flip_h:
 		marker.position.x = -marker_base_offset_x - 60
 	else:
 		marker.position.x = marker_base_offset_x
 
-	# 2. 攻击帧检测逻辑
+	# 3. 攻击帧检测逻辑（包含前摇结束后恢复速度的逻辑）
 	check_attack_frames()
 
-	# 3. 状态判定
+	# 4. 状态判定
 	var is_attacking = sprite.animation == "attack" and sprite.is_playing()
 	var is_air_attacking = sprite.animation == "attack_jump" and sprite.is_playing()
 
-	# 4. 移动与重力处理
+	# 5. 移动与重力处理
 	if is_attacking and is_on_floor():
 		velocity.x = 0
 	elif not is_on_floor():
@@ -102,7 +99,7 @@ func _physics_process(delta: float) -> void:
 		if was_in_air:
 			handle_landing_sequence()
 
-	# 5. 左右移动逻辑
+	# 6. 左右移动逻辑
 	var is_landing = sprite.animation == "onFloor" and sprite.is_playing()
 	var direction := Input.get_axis("Player_Right_left", "Player_Right_right")
 	
@@ -113,12 +110,12 @@ func _physics_process(delta: float) -> void:
 		else:
 			velocity.x = move_toward(velocity.x, 0, SPEED)
 
-	# 6. 跳跃逻辑
+	# 7. 跳跃逻辑
 	if Input.is_action_just_pressed("Player_Right_jump") and not is_landing:
 		if is_on_floor() or jump_count < 2:
 			jump_real()
 
-	# 7. 动画与战斗输入
+	# 8. 动画与战斗输入
 	handle_animations(direction)
 	move_and_slide()
 	
@@ -126,7 +123,6 @@ func _physics_process(delta: float) -> void:
 		if Input.is_action_just_pressed("Player_Right_Shoot") and energy >= 10:
 			start_attack()
 	
-	# 修改：增加对普通攻击状态的检测 (not is_attacking and not is_air_attacking)
 	if can_sp and not is_attacking and not is_air_attacking: 
 		if Input.is_action_just_pressed("Player_Right_SpShoot") and energy >= 30:
 			trigger_special_shoot()
@@ -138,10 +134,12 @@ func check_attack_frames():
 			if sprite.frame >= 24 and not has_attack_fired:
 				shoot_logic()
 				has_attack_fired = true
+				sprite.speed_scale = 1.0 # 发射子弹后，恢复正常速度播放后摇
 		"attack_jump":
 			if sprite.frame >= 3 and not has_attack_fired:
 				shoot_logic()
 				has_attack_fired = true
+				sprite.speed_scale = 1.0 # 恢复正常速度
 		"sp_attack":
 			if sprite.frame >= 11 and not has_sp_attack_fired:
 				sp_shoot_logic()
@@ -152,6 +150,9 @@ func start_attack():
 	can_fire = false
 	energy -= 10
 	has_attack_fired = false 
+	# 加快前摇：将动画播放倍率设为 2.0
+	sprite.speed_scale = 2.0
+	
 	if not is_on_floor():
 		sprite.play("attack_jump")
 	else:
@@ -160,16 +161,17 @@ func start_attack():
 
 # 特殊攻击启动
 func trigger_special_shoot():
-	can_sp = false # 消耗特殊攻击冷却
+	can_sp = false 
 	energy -= 30
 	has_sp_attack_fired = false
+	sprite.speed_scale = 1.0 # 确保特殊攻击速度正常
 	sprite.play("sp_attack")
 	
 	if not is_on_floor():
 		velocity.y *= 0.5 
-		velocity.x = 0 # 空中释放时清除水平惯性
+		velocity.x = 0 
 	
-	$Timer/sp_Cooldown.start() # 使用独立计时器
+	$Timer/sp_Cooldown.start() 
 
 func shoot_logic():
 	audio_stream_player.play() 
@@ -216,6 +218,7 @@ func handle_animations(direction: float):
 		if sprite.is_playing():
 			return 
 		else:
+			sprite.speed_scale = 1.0 # 动画播放完毕强制重置速度倍率
 			if is_on_floor():
 				if currently_moving: sprite.play("run")
 				else: sprite.play("idle")
@@ -272,7 +275,7 @@ func _on_fire_colldown_timeout() -> void:
 	can_fire = true
 
 func _on_sp_cooldown_timeout() -> void:
-	can_sp = true # 特殊攻击冷却结束
+	can_sp = true 
 
 func _on_rebound_cooldown_timeout() -> void:
 	rebound = false

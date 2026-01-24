@@ -11,6 +11,7 @@ var righr_bullets_scene: PackedScene = preload("res://Scenes/Bullets/right_bulle
 var energy_ball_scene: PackedScene = preload("res://Scenes/Objects/energy.tscn")
 var rebound_ball_scene: PackedScene = preload("res://Scenes/Objects/rebound.tscn")
 var guard_ball_scene: PackedScene = preload("res://Scenes/Objects/guard.tscn")
+var health_ball_scene: PackedScene = preload("res://Scenes/Objects/health.tscn")
 
 var can_create_object: bool = true
 
@@ -35,11 +36,9 @@ func _ready() -> void:
 	base_left.global_position = $Mark/base_left.global_position
 	base_right.global_position = $Mark/base_right.global_position
 	
-	# 初始播放音乐
 	if bgm_player:
 		bgm_player.play()
 	
-	# 重新连接信号，确保没有重复连接或遗漏
 	if not player_left.sp_fire.is_connected(_on_player_left_sp_fire):
 		player_left.sp_fire.connect(_on_player_left_sp_fire)
 	if not player_right.sp_fire.is_connected(_on_player_right_sp_fire):
@@ -49,12 +48,9 @@ func _ready() -> void:
 	player_right.fire.connect(_on_player_right_fire)
 
 func _process(_delta: float) -> void:
-	# --- 核心：BGM 无缝循环检测 ---
 	if bgm_player and bgm_player.playing:
 		var current_pos = bgm_player.get_playback_position()
 		var stream_length = bgm_player.stream.get_length()
-		
-		# 当播放位置达到总长度时（减去极小偏差以确保衔接顺滑）
 		if current_pos >= stream_length - 0.02:
 			bgm_player.seek(loop_start_time)
 
@@ -64,20 +60,17 @@ func _physics_process(_delta: float) -> void:
 		can_create_object = false
 		$Objects/Timer.start()
 	
-	if die_time_left:
-		player_left.hurt(5)
-		die_time_left = false
-		$Base/Left.start()
+	#if die_time_left:
+		#player_left.hurt(5)
+		#die_time_left = false
+		#$Base/Left.start()
 		
-	if die_time_right:
-		player_right.hurt(5)
-		die_time_right = false
-		$Base/Right.start()
-
-# --- 核心：特殊射击实例化逻辑 ---
+	#if die_time_right:
+		#player_right.hurt(5)
+		#die_time_right = false
+		#$Base/Right.start()
 
 func _on_player_left_sp_fire(fire_pos: Vector2, directions: Array) -> void:
-	print("收到左侧特殊攻击信号，数组长度: ", directions.size())
 	for i in range(directions.size()):
 		var bullet = left_bullets_scene.instantiate()
 		bullet.global_position = fire_pos
@@ -85,10 +78,8 @@ func _on_player_left_sp_fire(fire_pos: Vector2, directions: Array) -> void:
 		bullet.get_direction(directions[i])
 		if bullet.has_signal("rebound_bullet"):
 			bullet.rebound_bullet.connect(_on_left_bullet_rebound)
-		print("左侧子弹 ", i, " 已实例化，方向: ", directions[i])
 
 func _on_player_right_sp_fire(fire_pos: Vector2, directions: Array) -> void:
-	print("收到右侧特殊攻击信号，数组长度: ", directions.size())
 	for i in range(directions.size()):
 		var bullet = righr_bullets_scene.instantiate()
 		bullet.global_position = fire_pos
@@ -96,9 +87,6 @@ func _on_player_right_sp_fire(fire_pos: Vector2, directions: Array) -> void:
 		bullet.get_direction(directions[i])
 		if bullet.has_signal("rebound_bullet"):
 			bullet.rebound_bullet.connect(_on_right_bullet_rebound)
-		print("右侧子弹 ", i, " 已实例化，方向: ", directions[i])
-
-# --- 普通射击与反弹 ---
 
 func _on_player_left_fire(fire_pos: Vector2, fire_direction: Vector2) -> void:
 	var bullet = left_bullets_scene.instantiate()
@@ -128,23 +116,28 @@ func _on_right_bullet_rebound(pos: Vector2, dir: Vector2) -> void:
 	bullet.get_direction(dir)
 	bullet.rebound_bullet.connect(_on_left_bullet_rebound)
 
-# --- 其他逻辑 ---
-
+# --- 修改后的生成逻辑 ---
 func create_objects():
 	var random_range: Vector2 = Vector2(randf_range(340, 1580), -100)
-	var object
+	var object: Node
 	
-	# 如果左右基地都死了，只生成 energy_ball
 	if left_base_die and right_base_die:
 		object = energy_ball_scene.instantiate()
 	else:
-		var random_select = randi_range(0, 2)
-		if random_select == 0: object = energy_ball_scene.instantiate()
-		elif random_select == 1: object = guard_ball_scene.instantiate()
-		else: object = rebound_ball_scene.instantiate()
+		var random_select = randi_range(0, 3) # 确保是 0, 1, 2, 3
+		match random_select:
+			0: object = energy_ball_scene.instantiate()
+			1: object = guard_ball_scene.instantiate()
+			2: object = rebound_ball_scene.instantiate()
+			3: 
+				if health_ball_scene: # 安全检查
+					object = health_ball_scene.instantiate()
+				else:
+					object = energy_ball_scene.instantiate() # 备选方案
 		
-	object.global_position = random_range
-	$Objects.add_child(object)
+	if object:
+		object.global_position = random_range
+		$Objects.add_child(object)
 
 func GameEvaluate():
 	get_tree().change_scene_to_file("res://Scenes/UI/game_evaluate.tscn")
@@ -154,16 +147,14 @@ func _on_timer_timeout() -> void:
 
 func _on_base_left_left_base_died() -> void:
 	left_base_die = true
-	# 检查是否满足双基地破坏条件以缩短时间
 	if right_base_die:
-		$Objects/Timer.wait_time = 1
+		$Objects/Timer.wait_time = 2# 统一为 0.5 提升节奏
 	$Base/Left.start()
 
 func _on_base_right_right_base_died() -> void:
 	right_base_die = true
-	# 检查是否满足双基地破坏条件以缩短时间
 	if left_base_die:
-		$Objects/Timer.wait_time = 0.5
+		$Objects/Timer.wait_time = 2
 	$Base/Right.start()
 
 func _on_left_timeout() -> void: 
@@ -172,13 +163,9 @@ func _on_right_timeout() -> void:
 	die_time_right = true
 
 func _on_player_left_player_left_died(): 
-	Global.ava = right_ava; 
-	Global.eva = right_eva; 
-	Global.winner = 1
+	Global.ava = right_ava; Global.eva = right_eva; Global.winner = 1
 	GameEvaluate()
 	
 func _on_player_right_player_right_died(): 
-	Global.ava = left_ava; 
-	Global.eva = left_eva; 
-	Global.winner = 2
+	Global.ava = left_ava; Global.eva = left_eva; Global.winner = 2
 	GameEvaluate()

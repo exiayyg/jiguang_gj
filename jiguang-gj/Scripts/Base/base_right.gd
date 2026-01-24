@@ -32,7 +32,7 @@ func spawn_heal_ball():
 	heal_ball.emit($Marker2D.global_position)
 	if player != null:
 		player.energy = clampi(player.energy + 10, 0, 100)
-		player.health = clampi(player.health + 1, 0, 100)
+		#player.health = clampi(player.health + 1, 0, 100)
 				
 	heal = false
 	$Timer.start()

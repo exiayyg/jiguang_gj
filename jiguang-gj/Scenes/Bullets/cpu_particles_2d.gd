@@ -1,14 +1,24 @@
 extends Node2D
 
-@onready var particles: CPUParticles2D = $"."
+@onready var particles: CPUParticles2D = $"." 
+
+# 外部传入的方向变量
+var direction: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
-	particles.emitting = true
+	# 确保粒子节点存在
+	if particles:
+		# 1. 处理发射方向
+		if direction != Vector2.ZERO:
+			particles.direction = Vector2(direction.x, direction.y)
+		
+		
+		particles.gravity = Vector2.ZERO
+		
 	
-	# 考虑到生命周期有随机性，计算可能的最大停留时间
-	# 最大寿命 = 基准寿命 * (1 + 随机性系数)
+		particles.emitting = true
+	
+	# 自动销毁逻辑
 	var max_life = particles.lifetime * (1.0 + particles.lifetime_randomness)
-	
-	# 使用计时器等待最长寿命结束后清理内存
 	await get_tree().create_timer(max_life).timeout
 	queue_free()

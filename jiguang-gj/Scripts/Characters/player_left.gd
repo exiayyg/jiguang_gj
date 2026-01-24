@@ -17,7 +17,6 @@ var hit_particle_scene: PackedScene = preload("res://Scenes/Objects/particle2.ts
 
 @onready var audio_stream_player: AudioStreamPlayer = $AudioStreamPlayer
 
-
 # 状态追踪
 var is_moving: bool = false 
 var jump_count: int = 0      
@@ -26,20 +25,15 @@ var can_fire: bool = true
 var can_sp: bool = true
 
 @export var marker_base_offset_x: float = 0.0
-# 标记本轮攻击是否已经发射过子弹
 var has_attack_fired: bool = false
 var has_sp_attack_fired: bool = false 
-# 标记当前是否为特殊攻击
 var is_doing_special: bool = false
 
-# 特殊buff
 var guard: bool = false
 var rebound: bool = false
-
 var die: bool = false
 
 signal fire(fire_pos: Vector2, fire_direction: Vector2)
-# 定义特殊射击信号，传递位置和方向数组
 signal sp_fire(fire_pos: Vector2, directions: Array) 
 signal player_left_died
 
@@ -49,8 +43,6 @@ func _ready() -> void:
 	marker_base_offset_x = abs(marker.position.x)
 
 func _physics_process(delta: float) -> void:
-	
-	# --- 0. 死亡判定与输入拦截 ---
 	if health <= 0:
 		die = true
 		velocity.x = 0
@@ -70,7 +62,6 @@ func _physics_process(delta: float) -> void:
 	# --- 1. 特殊攻击拦截逻辑 ---
 	var is_sp_attacking = sprite.animation == "sp_attack" and sprite.is_playing()
 	if is_sp_attacking:
-		# 强制停止水平移动并处理重力
 		if is_on_floor():
 			velocity.x = 0
 		else:
@@ -78,32 +69,34 @@ func _physics_process(delta: float) -> void:
 			velocity.x = 0
 			velocity.y *= 0.5
 		
-		# 处理发射逻辑
 		if sprite.frame == 13 and not has_sp_attack_fired:
 			sp_shoot_logic()
 			has_sp_attack_fired = true
 			
 		move_and_slide()
-		# 拦截所有其他输入
 		return
 
-	# --- 2. Marker2D 位置实时更新 ---
 	if sprite.flip_h:
 		marker.position.x = -marker_base_offset_x
 	else:
 		marker.position.x = marker_base_offset_x
 	
-	# --- 3. 攻击发射逻辑检测 ---
+	# --- 2. 攻击发射逻辑检测与动态调速 ---
 	if sprite.animation == "attack":
 		if sprite.frame == 7 and not has_attack_fired:
 			shoot_logic()
 			has_attack_fired = true
+			sprite.speed_scale = 1.0 # 发射后恢复原速（后摇变回正常）
 	elif sprite.animation == "attack_jump":
 		if sprite.frame == 3 and not has_attack_fired:
 			shoot_logic()
 			has_attack_fired = true
+			sprite.speed_scale = 1.0 # 发射后恢复原速
+	else:
+		# 非攻击状态下确保速度倍率为 1
+		if sprite.speed_scale != 1.0:
+			sprite.speed_scale = 1.0
 
-	# --- 4. 状态判定 ---
 	var is_ground_attacking = sprite.animation == "attack" and sprite.is_playing()
 	var is_air_attacking = sprite.animation == "attack_jump" and sprite.is_playing()
 	
@@ -112,7 +105,6 @@ func _physics_process(delta: float) -> void:
 		move_and_slide() 
 		return 
 
-	# --- 5. 重力与落地检测 ---
 	if not is_on_floor():
 		velocity += get_gravity() * delta
 		if is_air_attacking: 
@@ -129,10 +121,7 @@ func _physics_process(delta: float) -> void:
 			if was_in_air:
 				handle_landing_sequence()
 
-	# 6. 落地硬直判定
 	var is_landing = sprite.animation == "onFloor" and sprite.frame < sprite.sprite_frames.get_frame_count("onFloor") - 1
-	
-	# 7. 移动输入
 	var direction := Input.get_axis("Player_Left_left", "Player_Left_right")
 	
 	if is_landing:
@@ -145,22 +134,17 @@ func _physics_process(delta: float) -> void:
 			else:
 				velocity.x = move_toward(velocity.x, 0, SPEED)
 
-	# 8. 跳跃逻辑
 	if Input.is_action_just_pressed("Player_Left_jump") and not is_landing and not is_air_attacking:
 		if is_on_floor() or jump_count < 2:
 			jump_real()
 
-	# 9. 动画处理
 	handle_animations(direction)
-
 	move_and_slide()
 	
-	# 10. 战斗输入
 	if can_fire:
 		if Input.is_action_just_pressed("Player_Left_Shoot") and energy >= 10:
 			start_attack(false)
 	
-	# 修改点：特殊攻击不会在普通攻击(is_ground_attacking/is_air_attacking)期间被触发
 	if can_sp and not is_ground_attacking and not is_air_attacking:
 		if Input.is_action_just_pressed("Player_Left_SpShoot") and energy >= 30:
 			trigger_special_shoot()
@@ -175,6 +159,9 @@ func start_attack(is_special: bool):
 	energy -= 10
 	has_attack_fired = false 
 	
+	# 实现前摇缩短的关键：启动时播放速度翻倍
+	sprite.speed_scale = 2.0
+	
 	if not is_on_floor():
 		sprite.play("attack_jump")
 		velocity.y *= 0.5
@@ -187,16 +174,17 @@ func trigger_special_shoot():
 	can_sp = false
 	energy -= 30
 	has_sp_attack_fired = false
+	sprite.speed_scale = 1.0 # 特殊攻击不享受前摇加速
 	
 	if not is_on_floor():
-		velocity.x = 0 # 立即清除水平惯性
+		velocity.x = 0 
 		velocity.y *= 0.5
 		
 	sprite.play("sp_attack")
 	$Timer/sp_Cooldown.start()
 
 func shoot_logic():
-	audio_stream_player.play() # 播放发射音效
+	audio_stream_player.play() 
 	var bullet_dir = Vector2.LEFT if sprite.flip_h else Vector2.RIGHT
 	fire.emit(marker.global_position, bullet_dir)
 	
@@ -205,13 +193,9 @@ func shoot_logic():
 	get_parent().add_child(effect)
 
 func sp_shoot_logic():
-	audio_stream_player.play() # 播放特殊发射音效
+	audio_stream_player.play() 
 	var base_dir = Vector2.LEFT if sprite.flip_h else Vector2.RIGHT
-	var dirs = []
-	dirs.append(base_dir) 
-	dirs.append(base_dir.rotated(deg_to_rad(-10))) 
-	dirs.append(base_dir.rotated(deg_to_rad(10))) 
-	
+	var dirs = [base_dir, base_dir.rotated(deg_to_rad(-10)), base_dir.rotated(deg_to_rad(10))]
 	sp_fire.emit(marker.global_position, dirs)
 
 func jump_real():
@@ -223,14 +207,12 @@ func jump_real():
 
 func handle_animations(direction: float):
 	var currently_moving = direction != 0
-	
-	if sprite.animation == "die":
-		return
+	if sprite.animation == "die": return
 
 	if sprite.animation in ["attack", "attack_jump", "sp_attack"]:
-		if sprite.is_playing():
-			return 
+		if sprite.is_playing(): return 
 		else:
+			sprite.speed_scale = 1.0 # 动画结束后强制重置
 			if is_on_floor():
 				was_in_air = false
 				jump_count = 0
@@ -246,8 +228,7 @@ func handle_animations(direction: float):
 	
 	if not is_on_floor():
 		if velocity.y < 0:
-			if sprite.animation != "jump":
-				sprite.play("jump")
+			if sprite.animation != "jump": sprite.play("jump")
 		else:
 			if sprite.animation == "jump":
 				if sprite.frame == sprite.sprite_frames.get_frame_count("jump") - 1:
@@ -284,13 +265,10 @@ func handle_animations(direction: float):
 		elif not currently_moving and sprite.animation != "idle": sprite.play("idle")
 
 func hurt(damage: int):
-	if rebound:
-		pass
-	elif guard:
-		guard = false
+	if rebound: pass
+	elif guard: guard = false
 	else:
-		if health > 0:
-			$AnimationPlayer.play("hurt")
+		if health > 0: $AnimationPlayer.play("hurt")
 		if damage > 5:
 			$AnimationPlayer.play("hurt")
 			$AudioStreamPlayer2.play()
@@ -299,10 +277,8 @@ func hurt(damage: int):
 func _on_fire_cooldown_timeout() -> void:
 	can_fire = true
 
-
 func _on_sp_cooldown_timeout() -> void:
 	can_sp = true
-
 
 func _on_rebound_cooldown_timeout() -> void:
 	rebound = false

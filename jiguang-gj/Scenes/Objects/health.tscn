@@ -1,0 +1,26 @@
+[gd_scene load_steps=6 format=3 uid="uid://cauh5sr5vhoc8"]
+
+[ext_resource type="PackedScene" uid="uid://b7yrvx416utdh" path="res://Scenes/Objects/object.tscn" id="1_d0ou2"]
+[ext_resource type="Texture2D" uid="uid://ck3l1p7c02h8i" path="res://Assets/Object/回血球.png" id="2_6di4b"]
+[ext_resource type="Script" uid="uid://cy00ljr6ppp87" path="res://Scripts/Objects/health.gd" id="2_jd5ly"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_jd5ly"]
+radius = 33.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_6di4b"]
+radius = 33.06055
+
+[node name="health" instance=ExtResource("1_d0ou2")]
+script = ExtResource("2_jd5ly")
+
+[node name="CollisionShape2D" parent="." index="0"]
+shape = SubResource("CircleShape2D_jd5ly")
+
+[node name="Sprite2D" parent="." index="1"]
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("2_6di4b")
+
+[node name="CollisionShape2D" parent="Area2D" index="0"]
+shape = SubResource("CircleShape2D_6di4b")
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
