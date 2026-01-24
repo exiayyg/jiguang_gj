@@ -132,11 +132,17 @@ func _on_right_bullet_rebound(pos: Vector2, dir: Vector2) -> void:
 
 func create_objects():
 	var random_range: Vector2 = Vector2(randf_range(340, 1580), -100)
-	var random_select = randi_range(0, 2)
 	var object
-	if random_select == 0: object = energy_ball_scene.instantiate()
-	elif random_select == 1: object = guard_ball_scene.instantiate()
-	else: object = rebound_ball_scene.instantiate()
+	
+	# 如果左右基地都死了，只生成 energy_ball
+	if left_base_die and right_base_die:
+		object = energy_ball_scene.instantiate()
+	else:
+		var random_select = randi_range(0, 2)
+		if random_select == 0: object = energy_ball_scene.instantiate()
+		elif random_select == 1: object = guard_ball_scene.instantiate()
+		else: object = rebound_ball_scene.instantiate()
+		
 	object.global_position = random_range
 	$Objects.add_child(object)
 
@@ -148,10 +154,16 @@ func _on_timer_timeout() -> void:
 
 func _on_base_left_left_base_died() -> void:
 	left_base_die = true
+	# 检查是否满足双基地破坏条件以缩短时间
+	if right_base_die:
+		$Objects/Timer.wait_time = 1
 	$Base/Left.start()
 
 func _on_base_right_right_base_died() -> void:
 	right_base_die = true
+	# 检查是否满足双基地破坏条件以缩短时间
+	if left_base_die:
+		$Objects/Timer.wait_time = 0.5
 	$Base/Right.start()
 
 func _on_left_timeout() -> void: 

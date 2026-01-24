@@ -31,9 +31,8 @@ func _process(_delta: float) -> void:
 func spawn_heal_ball():
 	heal_ball.emit($Marker2D.global_position)
 	if player != null:
-		# 使用 clampi 优化：增加 30 点，但不超过 100，不低于原有值
-		player.energy = clampi(player.energy + 30, 0, 100)
-		player.health = clampi(player.health + 10, 0, 100)
+		player.energy = clampi(player.energy + 10, 0, 100)
+		player.health = clampi(player.health + 1, 0, 100)
 				
 	heal = false
 	$Timer.start()

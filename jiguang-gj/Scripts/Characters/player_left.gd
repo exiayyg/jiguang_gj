@@ -67,13 +67,33 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return
 
-	# --- 1. Marker2D 位置实时更新 ---
+	# --- 1. 特殊攻击拦截逻辑 ---
+	var is_sp_attacking = sprite.animation == "sp_attack" and sprite.is_playing()
+	if is_sp_attacking:
+		# 强制停止水平移动并处理重力
+		if is_on_floor():
+			velocity.x = 0
+		else:
+			velocity += get_gravity() * delta
+			velocity.x = 0
+			velocity.y *= 0.5
+		
+		# 处理发射逻辑
+		if sprite.frame == 13 and not has_sp_attack_fired:
+			sp_shoot_logic()
+			has_sp_attack_fired = true
+			
+		move_and_slide()
+		# 拦截所有其他输入
+		return
+
+	# --- 2. Marker2D 位置实时更新 ---
 	if sprite.flip_h:
 		marker.position.x = -marker_base_offset_x
 	else:
 		marker.position.x = marker_base_offset_x
 	
-	# --- 2. 攻击发射逻辑检测 ---
+	# --- 3. 攻击发射逻辑检测 ---
 	if sprite.animation == "attack":
 		if sprite.frame == 7 and not has_attack_fired:
 			shoot_logic()
@@ -82,31 +102,25 @@ func _physics_process(delta: float) -> void:
 		if sprite.frame == 3 and not has_attack_fired:
 			shoot_logic()
 			has_attack_fired = true
-	# 特殊攻击第 13 帧发射逻辑
-	elif sprite.animation == "sp_attack":
-		if sprite.frame == 13 and not has_sp_attack_fired:
-			sp_shoot_logic()
-			has_sp_attack_fired = true
 
-	# --- 3. 状态判定 ---
+	# --- 4. 状态判定 ---
 	var is_ground_attacking = sprite.animation == "attack" and sprite.is_playing()
 	var is_air_attacking = sprite.animation == "attack_jump" and sprite.is_playing()
-	var is_sp_attacking = sprite.animation == "sp_attack" and sprite.is_playing()
 	
-	if is_ground_attacking or (is_sp_attacking and is_on_floor()): 
+	if is_ground_attacking: 
 		velocity.x = 0
 		move_and_slide() 
 		return 
 
-	# --- 4. 重力与落地检测 ---
+	# --- 5. 重力与落地检测 ---
 	if not is_on_floor():
 		velocity += get_gravity() * delta
-		if is_air_attacking or is_sp_attacking: 
+		if is_air_attacking: 
 			velocity.y *= 0.5
 		was_in_air = true
 	else:
-		if is_air_attacking or is_sp_attacking:
-			if not (has_attack_fired or has_sp_attack_fired):
+		if is_air_attacking:
+			if not has_attack_fired:
 				velocity.x = 0 
 				velocity.y = 0
 			else:
@@ -115,41 +129,39 @@ func _physics_process(delta: float) -> void:
 			if was_in_air:
 				handle_landing_sequence()
 
-	# 5. 落地硬直判定
+	# 6. 落地硬直判定
 	var is_landing = sprite.animation == "onFloor" and sprite.frame < sprite.sprite_frames.get_frame_count("onFloor") - 1
 	
-	# 6. 移动输入
+	# 7. 移动输入
 	var direction := Input.get_axis("Player_Left_left", "Player_Left_right")
 	
 	if is_landing:
 		velocity.x = 0
-	elif is_sp_attacking and not is_on_floor():
-		# 新增需求：在空中发动特殊攻击时，禁用水平方向移动
-		velocity.x = 0
 	else:
-		if not (is_on_floor() and (is_air_attacking or is_sp_attacking) and not (has_attack_fired or has_sp_attack_fired)):
+		if not (is_on_floor() and is_air_attacking and not has_attack_fired):
 			if direction:
 				velocity.x = direction * SPEED
 				sprite.flip_h = direction < 0
 			else:
 				velocity.x = move_toward(velocity.x, 0, SPEED)
 
-	# 7. 跳跃逻辑
-	if Input.is_action_just_pressed("Player_Left_jump") and not is_landing and not (is_air_attacking or is_sp_attacking):
+	# 8. 跳跃逻辑
+	if Input.is_action_just_pressed("Player_Left_jump") and not is_landing and not is_air_attacking:
 		if is_on_floor() or jump_count < 2:
 			jump_real()
 
-	# 8. 动画处理
+	# 9. 动画处理
 	handle_animations(direction)
 
 	move_and_slide()
 	
-	# 9. 战斗输入
+	# 10. 战斗输入
 	if can_fire:
 		if Input.is_action_just_pressed("Player_Left_Shoot") and energy >= 10:
 			start_attack(false)
 	
-	if can_sp:
+	# 修改点：特殊攻击不会在普通攻击(is_ground_attacking/is_air_attacking)期间被触发
+	if can_sp and not is_ground_attacking and not is_air_attacking:
 		if Input.is_action_just_pressed("Player_Left_SpShoot") and energy >= 30:
 			trigger_special_shoot()
 
@@ -277,8 +289,6 @@ func hurt(damage: int):
 	elif guard:
 		guard = false
 	else:
-		#if has_node("AnimationPlayer"):
-			#$AnimationPlayer.play("hurt")
 		if health > 0:
 			$AnimationPlayer.play("hurt")
 		if damage > 5:

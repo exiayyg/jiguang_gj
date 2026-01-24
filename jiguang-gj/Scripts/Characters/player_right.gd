@@ -62,6 +62,20 @@ func _physics_process(delta: float) -> void:
 		move_and_slide()
 		return # 直接返回，拦截所有后续镜像、攻击、移动检测逻辑
 
+	# --- 新增：特殊攻击拦截逻辑 ---
+	var is_sp_attacking = sprite.animation == "sp_attack" and sprite.is_playing()
+	if is_sp_attacking:
+		# 即使在特殊攻击中也需要处理重力和镜像同步，但拦截所有动作输入
+		if not is_on_floor():
+			velocity += get_gravity() * delta
+			velocity.y *= 0.5 # 特殊攻击时重力减缓
+		else:
+			velocity.x = 0
+		
+		check_attack_frames() # 允许发射信号
+		move_and_slide()
+		return # 拦截后续的移动、跳跃、攻击指令输入
+
 	# 1. 镜像处理
 	if sprite.flip_h:
 		marker.position.x = -marker_base_offset_x - 60
@@ -74,14 +88,13 @@ func _physics_process(delta: float) -> void:
 	# 3. 状态判定
 	var is_attacking = sprite.animation == "attack" and sprite.is_playing()
 	var is_air_attacking = sprite.animation == "attack_jump" and sprite.is_playing()
-	var is_sp_attacking = sprite.animation == "sp_attack" and sprite.is_playing()
 
 	# 4. 移动与重力处理
-	if (is_attacking or is_sp_attacking) and is_on_floor():
+	if is_attacking and is_on_floor():
 		velocity.x = 0
 	elif not is_on_floor():
 		velocity += get_gravity() * delta
-		if is_attacking or is_air_attacking or is_sp_attacking:
+		if is_attacking or is_air_attacking:
 			velocity.y *= 0.5
 			velocity.x *= 0.5
 		was_in_air = true
@@ -93,7 +106,7 @@ func _physics_process(delta: float) -> void:
 	var is_landing = sprite.animation == "onFloor" and sprite.is_playing()
 	var direction := Input.get_axis("Player_Right_left", "Player_Right_right")
 	
-	if not (is_attacking or is_sp_attacking or is_landing):
+	if not (is_attacking or is_landing):
 		if direction != 0:
 			velocity.x = direction * SPEED
 			sprite.flip_h = direction < 0
@@ -101,7 +114,7 @@ func _physics_process(delta: float) -> void:
 			velocity.x = move_toward(velocity.x, 0, SPEED)
 
 	# 6. 跳跃逻辑
-	if Input.is_action_just_pressed("Player_Right_jump") and not is_landing and not is_sp_attacking:
+	if Input.is_action_just_pressed("Player_Right_jump") and not is_landing:
 		if is_on_floor() or jump_count < 2:
 			jump_real()
 
@@ -113,7 +126,8 @@ func _physics_process(delta: float) -> void:
 		if Input.is_action_just_pressed("Player_Right_Shoot") and energy >= 10:
 			start_attack()
 	
-	if can_sp: # 使用独立冷却判断
+	# 修改：增加对普通攻击状态的检测 (not is_attacking and not is_air_attacking)
+	if can_sp and not is_attacking and not is_air_attacking: 
 		if Input.is_action_just_pressed("Player_Right_SpShoot") and energy >= 30:
 			trigger_special_shoot()
 
@@ -153,7 +167,7 @@ func trigger_special_shoot():
 	
 	if not is_on_floor():
 		velocity.y *= 0.5 
-		velocity.x = 0 # 类似左侧角色逻辑，空中释放时清除水平惯性
+		velocity.x = 0 # 空中释放时清除水平惯性
 	
 	$Timer/sp_Cooldown.start() # 使用独立计时器
 

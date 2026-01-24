@@ -47,13 +47,12 @@ _data = {
 collision_layer = 8
 collision_mask = 4
 script = ExtResource("1_hyb38")
-max_health = 100
+max_health = 300
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("1_l2djw")
 
 [node name="Timer" type="Timer" parent="."]
-wait_time = 5.0
 
 [node name="Marker2D" type="Marker2D" parent="."]
 position = Vector2(-1, -147)

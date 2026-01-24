@@ -1,1 +1,8 @@
+res://Scenes/Base/base_left.tscn
+res://Scenes/Base/base_right.tscn
+res://Scripts/Base/base_left.gd
+res://Scripts/Base/base_right.gd
 res://Scenes/Levels/test_level.tscn
+res://Scripts/Levels/test_level.gd
+res://Scripts/Characters/player_right.gd
+res://Scripts/Characters/player_left.gd

@@ -33,8 +33,8 @@ func process_healing():
 	heal_ball.emit($Marker2D.global_position)
 	if player != null:
 		# 优化能量恢复逻辑：使用 clamp 限制在 0-100 之间
-		player.energy = clampi(player.energy + 30, 0, 100)
-		player.health = clampi(player.health + 10, 0, 100)
+		player.energy = clampi(player.energy + 10, 0, 100)
+		player.health = clampi(player.health + 1, 0, 100)
 	heal = false
 	$Timer.start()
 
