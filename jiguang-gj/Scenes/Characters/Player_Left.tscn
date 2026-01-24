@@ -1,0 +1,194 @@
+[gd_scene load_steps=18 format=3 uid="uid://djh0isgyf7ee0"]
+
+[ext_resource type="Script" uid="uid://dwi0wfxutefjm" path="res://Scripts/Characters/player_left.gd" id="1_nc8bx"]
+[ext_resource type="SpriteFrames" uid="uid://djgx2jh48npuu" path="res://Scenes/Characters/player_fire.tres" id="2_8wsy6"]
+[ext_resource type="Script" uid="uid://c2j1ilkboo67u" path="res://Scripts/UI/right_hud.gd" id="3_ipwqs"]
+[ext_resource type="Texture2D" uid="uid://gwvu2cn43i0x" path="res://Assets/BackGround/生成游戏通关背景图.png" id="4_n4l1c"]
+[ext_resource type="Texture2D" uid="uid://ctgo8bkfryy8f" path="res://Assets/Object/反弹球.png" id="5_3kxky"]
+[ext_resource type="Texture2D" uid="uid://c3ed03rmyw4rp" path="res://Assets/Object/护盾球.png" id="6_q4j76"]
+[ext_resource type="AudioStream" uid="uid://u36nxrx5ljh3" path="res://Assets/Audio/发射火球.mp3" id="7_q4j76"]
+[ext_resource type="Texture2D" uid="uid://dlk2afkmhdbxs" path="res://Assets/BackGround/头像 (赤焰).png" id="7_sv4gk"]
+[ext_resource type="AudioStream" uid="uid://babjfscw1v6cb" path="res://Assets/Audio/冰晶命中.mp3" id="8_n4l1c"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_s1g8l"]
+size = Vector2(47, 150)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ipwqs"]
+bg_color = Color(0.973, 0, 0.122, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_8wsy6"]
+font_size = 48
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_8wsy6"]
+bg_color = Color(0.094, 0.624, 0.969, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_ywl7y"]
+font_size = 48
+
+[sub_resource type="Animation" id="Animation_q4j76"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_3kxky"]
+resource_name = "hurt"
+length = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.125, 0.25),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(6.81, 6.81, 6.81, 1), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_q4j76"]
+_data = {
+&"RESET": SubResource("Animation_q4j76"),
+&"hurt": SubResource("Animation_3kxky")
+}
+
+[node name="PlayerLeft" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 69
+script = ExtResource("1_nc8bx")
+JUMP_VELOCITY = -650.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-0.5, 7)
+shape = SubResource("RectangleShape2D_s1g8l")
+
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.215, 0.215)
+sprite_frames = ExtResource("2_8wsy6")
+animation = &"sp_attack"
+autoplay = "idle"
+frame = 19
+frame_progress = 1.0
+
+[node name="Marker2D" type="Marker2D" parent="."]
+position = Vector2(80, -20)
+
+[node name="Timer" type="Node" parent="."]
+
+[node name="Fire_Cooldown" type="Timer" parent="Timer"]
+
+[node name="sp_Cooldown" type="Timer" parent="Timer"]
+wait_time = 3.0
+
+[node name="rebound_cooldown" type="Timer" parent="Timer"]
+wait_time = 3.0
+
+[node name="hud" type="CanvasLayer" parent="."]
+script = ExtResource("3_ipwqs")
+
+[node name="ColorRect" type="ColorRect" parent="hud"]
+offset_left = -1.0
+offset_right = 532.0
+offset_bottom = 144.0
+color = Color(0.25882354, 0.25882354, 0.25882354, 0.4)
+
+[node name="ColorRect2" type="ColorRect" parent="hud"]
+modulate = Color(0, 0, 0, 0.41568628)
+offset_top = -1.0
+offset_right = 146.0
+offset_bottom = 142.0
+
+[node name="TextureRect" type="TextureRect" parent="hud"]
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 1891.0
+offset_bottom = 1064.0
+scale = Vector2(0.076, 0.13)
+texture = ExtResource("4_n4l1c")
+flip_h = true
+
+[node name="hp" type="ProgressBar" parent="hud"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -1685.0
+offset_top = 33.0
+offset_right = -1442.0
+offset_bottom = 60.0
+grow_horizontal = 0
+theme_override_styles/fill = SubResource("StyleBoxFlat_ipwqs")
+
+[node name="Label" type="Label" parent="hud"]
+offset_left = 155.0
+offset_top = -3.0
+offset_right = 215.0
+offset_bottom = 64.0
+text = "hp"
+label_settings = SubResource("LabelSettings_8wsy6")
+
+[node name="mp" type="ProgressBar" parent="hud"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -1683.0
+offset_top = 88.0
+offset_right = -1441.0
+offset_bottom = 115.0
+grow_horizontal = 0
+theme_override_styles/fill = SubResource("StyleBoxFlat_8wsy6")
+
+[node name="Label2" type="Label" parent="hud"]
+offset_left = 148.0
+offset_top = 63.0
+offset_right = 224.0
+offset_bottom = 130.0
+text = "mp"
+label_settings = SubResource("LabelSettings_ywl7y")
+
+[node name="rebound" type="TextureRect" parent="hud"]
+offset_left = 50.0
+offset_top = 175.0
+offset_right = 110.0
+offset_bottom = 235.0
+texture = ExtResource("5_3kxky")
+expand_mode = 1
+
+[node name="guard" type="TextureRect" parent="hud"]
+offset_left = 150.0
+offset_top = 175.0
+offset_right = 210.0
+offset_bottom = 235.0
+texture = ExtResource("6_q4j76")
+expand_mode = 1
+
+[node name="TextureRect2" type="TextureRect" parent="hud"]
+offset_right = 40.0
+offset_bottom = 40.0
+scale = Vector2(0.5, 0.6)
+texture = ExtResource("7_sv4gk")
+flip_h = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_q4j76")
+}
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("7_q4j76")
+
+[node name="AudioStreamPlayer2" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("8_n4l1c")
+
+[connection signal="timeout" from="Timer/Fire_Cooldown" to="." method="_on_fire_cooldown_timeout"]
+[connection signal="timeout" from="Timer/sp_Cooldown" to="." method="_on_sp_cooldown_timeout"]
+[connection signal="timeout" from="Timer/rebound_cooldown" to="." method="_on_rebound_cooldown_timeout"]

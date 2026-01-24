@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://bhebfpypu5y71"]
+
+[ext_resource type="Texture2D" uid="uid://b65ebovidy1sh" path="res://Assets/BackGround/决斗图.png" id="1_ipp4p"]
+[ext_resource type="Script" uid="uid://nhbwp75tc3gy" path="res://Scenes/UI/battle.gd" id="1_vqpjb"]
+[ext_resource type="AudioStream" uid="uid://bpvrv8n4f562q" path="res://Assets/Audio/震慑.mp3" id="3_xdly2"]
+
+[node name="Battle" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+script = ExtResource("1_vqpjb")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -2.999999
+offset_top = -2.0
+offset_right = 2727.0
+offset_bottom = 1533.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.706, 0.706)
+texture = ExtResource("1_ipp4p")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_xdly2")

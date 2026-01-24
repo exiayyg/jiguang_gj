@@ -1,0 +1,52 @@
+[gd_scene load_steps=8 format=3 uid="uid://g7w8502dv1mw"]
+
+[ext_resource type="Script" uid="uid://dbh42nv2f1wdk" path="res://Scripts/Bullets/right_bullet.gd" id="1_h7ag4"]
+[ext_resource type="Texture2D" uid="uid://cpr0qwihgy7mb" path="res://Assets/Bullets/冰晶/1.png" id="2_f56h0"]
+[ext_resource type="Texture2D" uid="uid://wdf2d7ospaqs" path="res://Assets/Bullets/冰晶/2.png" id="3_ky4jw"]
+[ext_resource type="Texture2D" uid="uid://pj74nrulsra8" path="res://Assets/Bullets/冰晶/3.png" id="4_8gb5h"]
+[ext_resource type="AudioStream" uid="uid://babjfscw1v6cb" path="res://Assets/Audio/冰晶命中.mp3" id="5_ky4jw"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_spbwo"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_f56h0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_ky4jw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_8gb5h")
+}],
+"loop": true,
+"name": &"default",
+"speed": 15.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_h7ag4"]
+radius = 13.0
+height = 138.0
+
+[node name="Right_Bullet" type="Area2D"]
+collision_layer = 4
+collision_mask = 14
+script = ExtResource("1_h7ag4")
+speed = 1600.0
+
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(61, -1)
+scale = Vector2(0.15, 0.08)
+sprite_frames = SubResource("SpriteFrames_spbwo")
+autoplay = "default"
+frame_progress = 0.10923461
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(65, 0)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_h7ag4")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_ky4jw")
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

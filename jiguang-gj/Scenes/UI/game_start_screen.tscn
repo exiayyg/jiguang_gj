@@ -1,0 +1,63 @@
+[gd_scene load_steps=5 format=3 uid="uid://dlk13ngeuxg70"]
+
+[ext_resource type="Script" uid="uid://d05nayb2apeug" path="res://Scripts/UI/game_start_screen.gd" id="1_fcj5v"]
+[ext_resource type="Texture2D" uid="uid://d2pahkdwwxehd" path="res://Assets/BackGround/游戏界面.png" id="2_ylf1g"]
+[ext_resource type="Texture2D" uid="uid://cb5k2vx3mmu6f" path="res://Assets/BackGround/开始游戏.png" id="3_ylf1g"]
+[ext_resource type="Texture2D" uid="uid://dg0td6me8nbfk" path="res://Assets/BackGround/退出游戏.png" id="4_5lj4b"]
+
+[node name="GameStartScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_fcj5v")
+
+[node name="BackGround" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_ylf1g")
+
+[node name="Title" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.5
+anchor_top = 0.2
+anchor_right = 0.5
+anchor_bottom = 0.2
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 40.0
+grow_horizontal = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+custom_minimum_size = Vector2(400, 300)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -138.0
+offset_top = -28.0
+offset_right = 2592.0
+offset_bottom = 3046.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.1, 0.1)
+
+[node name="Start" type="TextureButton" parent="VBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("3_ylf1g")
+
+[node name="Exit" type="TextureButton" parent="VBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("4_5lj4b")
+
+[connection signal="pressed" from="VBoxContainer/Start" to="." method="_on_start_pressed"]
+[connection signal="pressed" from="VBoxContainer/Exit" to="." method="_on_exit_pressed"]

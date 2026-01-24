@@ -1,0 +1,78 @@
+[gd_scene load_steps=4 format=3 uid="uid://drr8kf8cwebpj"]
+
+[ext_resource type="Script" uid="uid://ywqu6rpisogt" path="res://Scripts/UI/hud.gd" id="1_omqfp"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jvg6e"]
+bg_color = Color(0, 0, 0, 0.39215687)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3odev"]
+bg_color = Color(1, 0.31592005, 0.32250315, 1)
+
+[node name="Hud" type="CanvasLayer"]
+script = ExtResource("1_omqfp")
+
+[node name="PlayerContainer" type="MarginContainer" parent="."]
+offset_right = 420.0
+offset_bottom = 160.0
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="PlayerPanel" type="PanelContainer" parent="PlayerContainer"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_jvg6e")
+
+[node name="Flex" type="HBoxContainer" parent="PlayerContainer/PlayerPanel"]
+layout_mode = 2
+
+[node name="PlayerAvatar" type="CenterContainer" parent="PlayerContainer/PlayerPanel/Flex"]
+custom_minimum_size = Vector2(140, 140)
+layout_mode = 2
+
+[node name="PlayerAvatarRect" type="TextureRect" parent="PlayerContainer/PlayerPanel/Flex/PlayerAvatar"]
+layout_mode = 2
+
+[node name="PlayerInfoBox" type="VBoxContainer" parent="PlayerContainer/PlayerPanel/Flex"]
+custom_minimum_size = Vector2(256, 140)
+layout_mode = 2
+
+[node name="PlayerNameLabel" type="Label" parent="PlayerContainer/PlayerPanel/Flex/PlayerInfoBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Player:Junior Test Engineer"
+
+[node name="PlayerLevelLabel" type="Label" parent="PlayerContainer/PlayerPanel/Flex/PlayerInfoBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Level.0"
+
+[node name="LifebloodContainer" type="Container" parent="PlayerContainer/PlayerPanel/Flex/PlayerInfoBox"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+
+[node name="LifeBar" type="ProgressBar" parent="PlayerContainer/PlayerPanel/Flex/PlayerInfoBox/LifebloodContainer"]
+custom_minimum_size = Vector2(240, 20)
+layout_mode = 2
+theme_override_styles/fill = SubResource("StyleBoxFlat_3odev")
+value = 100.0
+show_percentage = false
+
+[node name="LifeNumsLabel" type="Label" parent="PlayerContainer/PlayerPanel/Flex/PlayerInfoBox/LifebloodContainer/LifeBar"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "3/3"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="KillEnemyCount" type="Label" parent="."]
+modulate = Color(0, 0, 0, 1)
+offset_right = 236.0
+offset_bottom = 116.0

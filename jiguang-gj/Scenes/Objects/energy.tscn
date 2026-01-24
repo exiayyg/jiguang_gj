@@ -1,0 +1,27 @@
+[gd_scene load_steps=6 format=3 uid="uid://e1fxwsixykxs"]
+
+[ext_resource type="PackedScene" uid="uid://b7yrvx416utdh" path="res://Scenes/Objects/object.tscn" id="1_uyt74"]
+[ext_resource type="Texture2D" uid="uid://div10hnoon22y" path="res://Assets/Object/法力球.png" id="2_33m8x"]
+[ext_resource type="Script" uid="uid://bhptalqvfb50g" path="res://Scripts/Objects/energy.gd" id="2_nc0sp"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_33m8x"]
+size = Vector2(10, 14)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_33m8x"]
+radius = 33.0
+
+[node name="Energy" instance=ExtResource("1_uyt74")]
+script = ExtResource("2_nc0sp")
+
+[node name="CollisionShape2D" parent="." index="0"]
+position = Vector2(0, 20)
+shape = SubResource("RectangleShape2D_33m8x")
+
+[node name="Sprite2D" parent="." index="1"]
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("2_33m8x")
+
+[node name="CollisionShape2D" parent="Area2D" index="0"]
+shape = SubResource("CircleShape2D_33m8x")
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]

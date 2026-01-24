@@ -1,0 +1,82 @@
+[gd_scene load_steps=7 format=3 uid="uid://brtm4fbxr6tek"]
+
+[ext_resource type="Texture2D" uid="uid://daqybk82j4ils" path="res://Assets/particle/火焰1.png" id="1_chfg4"]
+[ext_resource type="Script" uid="uid://dta04bpv4paih" path="res://Scenes/Bullets/cpu_particles_2d.gd" id="2_ldll7"]
+[ext_resource type="Texture2D" uid="uid://d156cbantjjqg" path="res://Assets/particle/火焰3.png" id="3_ldll7"]
+[ext_resource type="Script" uid="uid://csksguymeg7gx" path="res://Scenes/Objects/cpu_particles_2d_2.gd" id="4_hwcmx"]
+[ext_resource type="Script" uid="uid://dj8dmf3dssym7" path="res://Scenes/Objects/cpu_particles_2d_3.gd" id="5_c60qt"]
+
+[sub_resource type="Gradient" id="Gradient_chfg4"]
+offsets = PackedFloat32Array(0, 0.72602737, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.47787982, 0.4778803, 0.47788, 1, 0, 0, 0, 0.23921569)
+
+[node name="particle2" type="Node2D"]
+
+[node name="CPUParticles2D" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 3
+texture = ExtResource("1_chfg4")
+one_shot = true
+explosiveness = 1.0
+randomness = 0.5
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 3.0
+particle_flag_align_y = true
+direction = Vector2(0.6, 0)
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 150.0
+initial_velocity_max = 250.0
+damping_min = 50.0
+damping_max = 100.0
+scale_amount_min = 0.04
+scale_amount_max = 0.08
+color_ramp = SubResource("Gradient_chfg4")
+script = ExtResource("2_ldll7")
+
+[node name="CPUParticles2D2" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 3
+texture = ExtResource("3_ldll7")
+lifetime = 0.6
+one_shot = true
+explosiveness = 1.0
+randomness = 0.5
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 3.0
+particle_flag_align_y = true
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 150.0
+initial_velocity_max = 250.0
+damping_min = 50.0
+damping_max = 100.0
+scale_amount_min = 0.04
+scale_amount_max = 0.08
+color_ramp = SubResource("Gradient_chfg4")
+script = ExtResource("4_hwcmx")
+
+[node name="CPUParticles2D3" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 3
+texture = ExtResource("1_chfg4")
+lifetime = 0.7
+one_shot = true
+explosiveness = 1.0
+randomness = 0.5
+local_coords = true
+emission_shape = 1
+emission_sphere_radius = 3.0
+particle_flag_align_y = true
+spread = 180.0
+gravity = Vector2(0, 0)
+initial_velocity_min = 150.0
+initial_velocity_max = 250.0
+damping_min = 50.0
+damping_max = 100.0
+scale_amount_min = 0.04
+scale_amount_max = 0.08
+color_ramp = SubResource("Gradient_chfg4")
+script = ExtResource("5_c60qt")

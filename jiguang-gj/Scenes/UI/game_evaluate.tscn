@@ -1,0 +1,89 @@
+[gd_scene load_steps=8 format=3 uid="uid://cpitetue4gvdc"]
+
+[ext_resource type="Script" uid="uid://h8afqxtrv0bq" path="res://Scripts/UI/game_evaluate.gd" id="1_6p2ak"]
+[ext_resource type="Texture2D" uid="uid://caw0veypt0rfx" path="res://Assets/Character/avater/right_ava.png" id="3_c8fku"]
+[ext_resource type="Texture2D" uid="uid://cb5k2vx3mmu6f" path="res://Assets/BackGround/开始游戏.png" id="3_p3kah"]
+[ext_resource type="Texture2D" uid="uid://dg0td6me8nbfk" path="res://Assets/BackGround/退出游戏.png" id="4_apfpr"]
+[ext_resource type="AudioStream" uid="uid://dvmaqy1dl5x1c" path="res://Assets/Audio/冰胜利音效.mp3" id="6_725ay"]
+[ext_resource type="AudioStream" uid="uid://bxsukkhfvgf08" path="res://Assets/Audio/火胜利音效.mp3" id="7_qe573"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_6p2ak"]
+font_size = 128
+font_color = Color(0.91228896, 0.9122889, 0.91228884, 1)
+
+[node name="GameEvaluate" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6p2ak")
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TextureRect2" type="TextureRect" parent="."]
+modulate = Color(1, 1, 1, 0.5254902)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_c8fku")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -364.0
+offset_top = -479.0
+offset_right = -57.0
+offset_bottom = -304.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "Win !"
+label_settings = SubResource("LabelSettings_6p2ak")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -145.0
+offset_top = -19.0
+offset_right = 2585.0
+offset_bottom = 3055.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.1, 0.1)
+
+[node name="Start" type="TextureButton" parent="VBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("3_p3kah")
+
+[node name="Exit" type="TextureButton" parent="VBoxContainer"]
+layout_mode = 2
+texture_normal = ExtResource("4_apfpr")
+
+[node name="snow" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6_725ay")
+
+[node name="fire" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("7_qe573")
+
+[connection signal="pressed" from="VBoxContainer/Start" to="." method="_on_start_pressed"]
+[connection signal="pressed" from="VBoxContainer/Exit" to="." method="_on_exit_pressed"]

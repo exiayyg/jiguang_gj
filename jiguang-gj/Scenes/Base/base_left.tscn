@@ -1,0 +1,79 @@
+[gd_scene load_steps=7 format=3 uid="uid://l8oqiyanygkp"]
+
+[ext_resource type="Script" uid="uid://du6eh24uq3r6v" path="res://Scripts/Base/base_left.gd" id="1_k7yql"]
+[ext_resource type="Texture2D" uid="uid://bas7nwbjx3ohk" path="res://Assets/Base/火魔法塔.png" id="1_ksk13"]
+
+[sub_resource type="Animation" id="Animation_ygg24"]
+length = 0.25
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.125, 0.25),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(11.149395, 11.149395, 11.149395, 1), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_k7yql"]
+resource_name = "hurt"
+length = 0.5
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:modulate")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.25, 0.5),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Color(1, 1, 1, 1), Color(7.8425736, 7.8425736, 7.8425736, 1), Color(1, 1, 1, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_dnkoj"]
+_data = {
+&"RESET": SubResource("Animation_ygg24"),
+&"hurt": SubResource("Animation_k7yql")
+}
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_k7yql"]
+bg_color = Color(0.972549, 0, 0.12156863, 1)
+
+[node name="Base_Left" type="StaticBody2D"]
+collision_layer = 8
+collision_mask = 4
+script = ExtResource("1_k7yql")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture = ExtResource("1_ksk13")
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 5.0
+
+[node name="Marker2D" type="Marker2D" parent="."]
+position = Vector2(-1, -147)
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+polygon = PackedVector2Array(-36, -120, -7, -126, 9, -107, 60, -44, 51, -23, 64, 31, 117, 143, -115, 145, -74, 48, -84, -20, -49, -97)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_dnkoj")
+}
+
+[node name="hp" type="ProgressBar" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -131.0
+offset_top = -202.0
+offset_right = 131.0
+offset_bottom = -175.0
+grow_horizontal = 0
+theme_override_styles/fill = SubResource("StyleBoxFlat_k7yql")
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

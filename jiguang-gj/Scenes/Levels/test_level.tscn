@@ -1,3 +1,196 @@
-[gd_scene format=3 uid="uid://bsdd44x1p0045"]
+[gd_scene load_steps=16 format=3 uid="uid://bsdd44x1p0045"]
+
+[ext_resource type="Script" uid="uid://b8dlgayv6kexi" path="res://Scripts/Levels/test_level.gd" id="1_7t06c"]
+[ext_resource type="PackedScene" uid="uid://djh0isgyf7ee0" path="res://Scenes/Characters/Player_Left.tscn" id="2_2ytpj"]
+[ext_resource type="Texture2D" uid="uid://1gfpbk740l2y" path="res://Assets/BackGround/背景.png" id="2_l7ek2"]
+[ext_resource type="Texture2D" uid="uid://he56gnxuljbh" path="res://Assets/BackGround/雪地.png" id="2_x4x4f"]
+[ext_resource type="PackedScene" uid="uid://frs5iloj56t5" path="res://Scenes/Characters/player_right.tscn" id="3_db73o"]
+[ext_resource type="PackedScene" uid="uid://l8oqiyanygkp" path="res://Scenes/Base/base_left.tscn" id="5_k8g1k"]
+[ext_resource type="Texture2D" uid="uid://c52p8hhkrug0j" path="res://Assets/BackGround/平台.png" id="6_l7ek2"]
+[ext_resource type="PackedScene" uid="uid://bueee64xccmt" path="res://Scenes/Base/base_right.tscn" id="6_x4x4f"]
+[ext_resource type="AudioStream" uid="uid://cbky4qnrfux3n" path="res://Assets/Audio/前奏.mp3" id="9_hyk2w"]
+[ext_resource type="Script" uid="uid://15xfmdoltcy" path="res://Scenes/Levels/audio_stream_player.gd" id="10_hyk2w"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_k8g1k"]
+size = Vector2(93, 1113)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_x4x4f"]
+size = Vector2(83, 1108)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_l7ek2"]
+size = Vector2(1949, 94)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_aeolh"]
+size = Vector2(1941, 287)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7rivk"]
+size = Vector2(186, 17)
 
 [node name="TestLevel" type="Node2D"]
+script = ExtResource("1_7t06c")
+
+[node name="Wall" type="Node2D" parent="."]
+
+[node name="LeftWall" type="StaticBody2D" parent="Wall"]
+position = Vector2(11, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall/LeftWall"]
+position = Vector2(-56.5, 546.5)
+shape = SubResource("RectangleShape2D_k8g1k")
+
+[node name="RightWall" type="StaticBody2D" parent="Wall"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall/RightWall"]
+position = Vector2(1949.5, 544)
+shape = SubResource("RectangleShape2D_x4x4f")
+
+[node name="TopWall" type="StaticBody2D" parent="Wall"]
+collision_layer = 32
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Wall/TopWall"]
+position = Vector2(951.5, -37)
+shape = SubResource("RectangleShape2D_l7ek2")
+
+[node name="BackGround" type="Sprite2D" parent="."]
+position = Vector2(951, 577)
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("2_l7ek2")
+
+[node name="Ground" type="StaticBody2D" parent="."]
+position = Vector2(0, 777)
+collision_mask = 26
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ground"]
+position = Vector2(965, 252)
+shape = SubResource("RectangleShape2D_aeolh")
+
+[node name="Sprite2D" type="Sprite2D" parent="Ground"]
+position = Vector2(958, -233)
+texture = ExtResource("2_x4x4f")
+
+[node name="Mark" type="Node2D" parent="."]
+
+[node name="Left_point" type="Marker2D" parent="Mark"]
+position = Vector2(340, 660)
+
+[node name="Right_point" type="Marker2D" parent="Mark"]
+position = Vector2(1580, 660)
+
+[node name="base_left" type="Marker2D" parent="Mark"]
+position = Vector2(120, 750)
+
+[node name="base_right" type="Marker2D" parent="Mark"]
+position = Vector2(1800, 750)
+
+[node name="Platform" type="Node2D" parent="."]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="Platform"]
+position = Vector2(640, 700)
+
+[node name="Sprite2D" type="Sprite2D" parent="Platform/StaticBody2D"]
+position = Vector2(2, -20)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("6_l7ek2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform/StaticBody2D"]
+position = Vector2(2, -1.5)
+shape = SubResource("RectangleShape2D_7rivk")
+one_way_collision = true
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="Platform"]
+position = Vector2(1280, 700)
+
+[node name="Sprite2D" type="Sprite2D" parent="Platform/StaticBody2D2"]
+position = Vector2(2, -20)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("6_l7ek2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform/StaticBody2D2"]
+position = Vector2(2, -1.5)
+shape = SubResource("RectangleShape2D_7rivk")
+one_way_collision = true
+
+[node name="StaticBody2D3" type="StaticBody2D" parent="Platform"]
+position = Vector2(960, 523)
+
+[node name="Sprite2D" type="Sprite2D" parent="Platform/StaticBody2D3"]
+position = Vector2(2, -20)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("6_l7ek2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform/StaticBody2D3"]
+position = Vector2(2, -1.5)
+shape = SubResource("RectangleShape2D_7rivk")
+one_way_collision = true
+
+[node name="StaticBody2D4" type="StaticBody2D" parent="Platform"]
+position = Vector2(480, 519)
+
+[node name="Sprite2D" type="Sprite2D" parent="Platform/StaticBody2D4"]
+position = Vector2(2, -20)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("6_l7ek2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform/StaticBody2D4"]
+position = Vector2(2, -1.5)
+shape = SubResource("RectangleShape2D_7rivk")
+one_way_collision = true
+
+[node name="StaticBody2D5" type="StaticBody2D" parent="Platform"]
+position = Vector2(1440, 519)
+
+[node name="Sprite2D" type="Sprite2D" parent="Platform/StaticBody2D5"]
+position = Vector2(2, -20)
+scale = Vector2(0.3, 0.3)
+texture = ExtResource("6_l7ek2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform/StaticBody2D5"]
+position = Vector2(2, -1.5)
+shape = SubResource("RectangleShape2D_7rivk")
+one_way_collision = true
+
+[node name="Objects" type="Node2D" parent="."]
+
+[node name="Timer" type="Timer" parent="Objects"]
+wait_time = 5.0
+
+[node name="Base" type="Node2D" parent="."]
+
+[node name="Base_Left" parent="Base" node_paths=PackedStringArray("player") instance=ExtResource("5_k8g1k")]
+player = NodePath("../../Player/PlayerLeft")
+
+[node name="Base_Right" parent="Base" node_paths=PackedStringArray("player") instance=ExtResource("6_x4x4f")]
+player = NodePath("../../Player/Player_Right")
+
+[node name="Left" type="Timer" parent="Base"]
+
+[node name="Right" type="Timer" parent="Base"]
+
+[node name="Player" type="Node2D" parent="."]
+
+[node name="PlayerLeft" parent="Player" instance=ExtResource("2_2ytpj")]
+
+[node name="Player_Right" parent="Player" instance=ExtResource("3_db73o")]
+
+[node name="Left_Bullets" type="Node2D" parent="."]
+
+[node name="Right_Bullets" type="Node2D" parent="."]
+
+[node name="Node" type="Node" parent="."]
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Node"]
+stream = ExtResource("9_hyk2w")
+script = ExtResource("10_hyk2w")
+
+[connection signal="timeout" from="Objects/Timer" to="." method="_on_timer_timeout"]
+[connection signal="left_base_died" from="Base/Base_Left" to="." method="_on_base_left_left_base_died"]
+[connection signal="right_base_died" from="Base/Base_Right" to="." method="_on_base_right_right_base_died"]
+[connection signal="timeout" from="Base/Left" to="." method="_on_left_timeout"]
+[connection signal="timeout" from="Base/Right" to="." method="_on_right_timeout"]
+[connection signal="fire" from="Player/PlayerLeft" to="." method="_on_player_left_fire"]
+[connection signal="player_left_died" from="Player/PlayerLeft" to="." method="_on_player_left_player_left_died"]
+[connection signal="sp_fire" from="Player/PlayerLeft" to="." method="_on_player_left_sp_fire"]
+[connection signal="fire" from="Player/Player_Right" to="." method="_on_player_right_fire"]
+[connection signal="player_right_died" from="Player/Player_Right" to="." method="_on_player_right_player_right_died"]
+[connection signal="sp_fire" from="Player/Player_Right" to="." method="_on_player_right_sp_fire"]

@@ -1,0 +1,95 @@
+[gd_scene load_steps=19 format=3 uid="uid://dpxlfwtjuarc3"]
+
+[ext_resource type="Script" uid="uid://ygv4xcpcc3tg" path="res://Scripts/Bullets/left_bullet.gd" id="1_vxl1m"]
+[ext_resource type="Texture2D" uid="uid://ch1ochoap8bws" path="res://Assets/Bullets/火球/1.png" id="2_aj5t4"]
+[ext_resource type="Texture2D" uid="uid://cfpmimow4ce5f" path="res://Assets/Bullets/火球/2.png" id="3_n0sko"]
+[ext_resource type="Texture2D" uid="uid://dvo7i1kec52ob" path="res://Assets/Bullets/火球/3.png" id="4_ipgap"]
+[ext_resource type="Texture2D" uid="uid://q7kb332vk8p1" path="res://Assets/Bullets/火球/4.png" id="5_efvmr"]
+[ext_resource type="Texture2D" uid="uid://cfgwe6nu13ww3" path="res://Assets/Bullets/火球/5.png" id="6_fpcha"]
+[ext_resource type="Texture2D" uid="uid://b0fmydjbnwsmv" path="res://Assets/Bullets/火球/6.png" id="7_8rxbj"]
+[ext_resource type="Texture2D" uid="uid://bk8qigx8i6mft" path="res://Assets/Bullets/火球/7.png" id="8_qipfy"]
+[ext_resource type="Texture2D" uid="uid://bq6ta1wv5gmus" path="res://Assets/Bullets/火球/8.png" id="9_h2pvk"]
+[ext_resource type="Texture2D" uid="uid://cgrtsqgjrp2lb" path="res://Assets/Bullets/火球/9.png" id="10_50vaj"]
+[ext_resource type="Texture2D" uid="uid://c0mujt44pv4ki" path="res://Assets/Bullets/火球/10.png" id="11_fj8in"]
+[ext_resource type="Texture2D" uid="uid://uaij4ti2dsug" path="res://Assets/Bullets/火球/11.png" id="12_1baef"]
+[ext_resource type="Texture2D" uid="uid://np6v8sgbwkgu" path="res://Assets/Bullets/火球/12.png" id="13_80kna"]
+[ext_resource type="Texture2D" uid="uid://cib8482474613" path="res://Assets/Bullets/火球/13.png" id="14_fhyx6"]
+[ext_resource type="Texture2D" uid="uid://di1dcw338lugm" path="res://Assets/Bullets/火球/14.png" id="15_a68ys"]
+[ext_resource type="AudioStream" uid="uid://bvwwtuijslbna" path="res://Assets/Audio/火球命中.wav" id="16_n0sko"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_i23rt"]
+height = 96.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_tbdok"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_aj5t4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_n0sko")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_ipgap")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_efvmr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_fpcha")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_8rxbj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_qipfy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_h2pvk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_50vaj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_fj8in")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_1baef")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_80kna")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_fhyx6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_a68ys")
+}],
+"loop": true,
+"name": &"default",
+"speed": 13.0
+}]
+
+[node name="Left_Bullet" type="Area2D"]
+collision_layer = 4
+collision_mask = 14
+script = ExtResource("1_vxl1m")
+speed = 1600.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(53, 0)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_i23rt")
+
+[node name="Sprite2D" type="AnimatedSprite2D" parent="."]
+position = Vector2(18, -2)
+scale = Vector2(0.2, 0.108)
+sprite_frames = SubResource("SpriteFrames_tbdok")
+autoplay = "default"
+frame_progress = 0.17308033
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("16_n0sko")
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

@@ -1,0 +1,73 @@
+[gd_scene load_steps=5 format=3 uid="uid://08awhtie0jpc"]
+
+[ext_resource type="Script" uid="uid://bv08pmexxoh8c" path="res://Scenes/UI/manhua.gd" id="1_0mpyb"]
+[ext_resource type="Texture2D" uid="uid://biwmsapvnheiw" path="res://Assets/BackGround/四格漫画.png" id="1_ash0l"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_0mpyb"]
+font_size = 18
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_aumef"]
+font_size = 18
+font_color = Color(0, 0, 0, 1)
+
+[node name="manhua" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_0mpyb")
+
+[node name="MangaFrames" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -412.0
+offset_top = -548.0
+offset_right = 1005.0
+offset_bottom = 1342.0
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.58, 0.58)
+
+[node name="TextureRect" type="TextureRect" parent="MangaFrames"]
+layout_mode = 2
+texture = ExtResource("1_ash0l")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(960, 160)
+zoom = Vector2(2.3, 3.8)
+
+[node name="Marker" type="Node2D" parent="."]
+
+[node name="Marker2D" type="Marker2D" parent="Marker"]
+position = Vector2(960, 160)
+
+[node name="Marker2D2" type="Marker2D" parent="Marker"]
+position = Vector2(960, 470)
+
+[node name="Marker2D3" type="Marker2D" parent="Marker"]
+position = Vector2(960, 850)
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_left = 686.0
+offset_top = 436.0
+offset_right = 1070.0
+offset_bottom = 503.0
+text = "我觉得火魔法更强"
+label_settings = SubResource("LabelSettings_0mpyb")
+
+[node name="Label2" type="Label" parent="."]
+layout_mode = 0
+offset_left = 1090.0
+offset_top = 409.0
+offset_right = 1414.0
+offset_bottom = 459.0
+text = "显然是冰魔法更厉害"
+label_settings = SubResource("LabelSettings_aumef")
