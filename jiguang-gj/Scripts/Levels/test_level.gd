@@ -48,11 +48,12 @@ func _ready() -> void:
 	player_right.fire.connect(_on_player_right_fire)
 
 func _process(_delta: float) -> void:
-	if bgm_player and bgm_player.playing:
-		var current_pos = bgm_player.get_playback_position()
-		var stream_length = bgm_player.stream.get_length()
-		if current_pos >= stream_length - 0.02:
-			bgm_player.seek(loop_start_time)
+	#if bgm_player and bgm_player.playing:
+		#var current_pos = bgm_player.get_playback_position()
+		#var stream_length = bgm_player.stream.get_length()
+		#if current_pos >= stream_length - 0.02:
+			#bgm_player.seek(loop_start_time)
+		$Node/AudioStreamPlayer2.play()
 
 func _physics_process(_delta: float) -> void:
 	if can_create_object:
@@ -148,7 +149,7 @@ func _on_timer_timeout() -> void:
 func _on_base_left_left_base_died() -> void:
 	left_base_die = true
 	if right_base_die:
-		$Objects/Timer.wait_time = 2# 统一为 0.5 提升节奏
+		$Objects/Timer.wait_time = 2
 	$Base/Left.start()
 
 func _on_base_right_right_base_died() -> void:

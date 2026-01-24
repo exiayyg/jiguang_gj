@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://bsdd44x1p0045"]
+[gd_scene load_steps=17 format=3 uid="uid://bsdd44x1p0045"]
 
 [ext_resource type="Script" uid="uid://b8dlgayv6kexi" path="res://Scripts/Levels/test_level.gd" id="1_7t06c"]
 [ext_resource type="PackedScene" uid="uid://djh0isgyf7ee0" path="res://Scenes/Characters/Player_Left.tscn" id="2_2ytpj"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://bueee64xccmt" path="res://Scenes/Base/base_right.tscn" id="6_x4x4f"]
 [ext_resource type="AudioStream" uid="uid://cbky4qnrfux3n" path="res://Assets/Audio/前奏.mp3" id="9_hyk2w"]
 [ext_resource type="Script" uid="uid://15xfmdoltcy" path="res://Scenes/Levels/audio_stream_player.gd" id="10_hyk2w"]
+[ext_resource type="AudioStream" uid="uid://wcf2exxql4iy" path="res://Assets/Audio/全曲5分钟版.mp3" id="11_mvu5i"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_k8g1k"]
 size = Vector2(93, 1113)
@@ -182,6 +183,9 @@ player = NodePath("../../Player/Player_Right")
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="Node"]
 stream = ExtResource("9_hyk2w")
 script = ExtResource("10_hyk2w")
+
+[node name="AudioStreamPlayer2" type="AudioStreamPlayer" parent="Node"]
+stream = ExtResource("11_mvu5i")
 
 [connection signal="timeout" from="Objects/Timer" to="." method="_on_timer_timeout"]
 [connection signal="left_base_died" from="Base/Base_Left" to="." method="_on_base_left_left_base_died"]
