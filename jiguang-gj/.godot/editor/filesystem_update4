@@ -1,14 +1,3 @@
-res://Scenes/Objects/health.tscn
-res://Scripts/Objects/health.gd
-res://Scenes/Levels/test_level.tscn
 res://Scenes/Characters/player_right.tscn
-res://Scenes/Characters/Player_Left.tscn
-res://Scripts/Levels/test_level.gd
-res://Scenes/Bullets/left_bullet.tscn
-res://Scripts/Bullets/left_bullet.gd
-res://Scenes/Bullets/right_bullet.tscn
-res://Scripts/Bullets/right_bullet.gd
-res://Scripts/Characters/player_left.gd
 res://Scripts/Characters/player_right.gd
-res://Scenes/Objects/particle.tscn
-res://Scenes/Bullets/cpu_particles_2d.gd
+res://Scenes/Levels/test_level.tscn

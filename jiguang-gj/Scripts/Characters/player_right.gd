@@ -79,39 +79,53 @@ func _physics_process(delta: float) -> void:
 	else:
 		marker.position.x = marker_base_offset_x
 
-	# 3. 攻击帧检测逻辑（包含前摇结束后恢复速度的逻辑）
+	# 3. 攻击帧检测逻辑
 	check_attack_frames()
 
 	# 4. 状态判定
 	var is_attacking = sprite.animation == "attack" and sprite.is_playing()
 	var is_air_attacking = sprite.animation == "attack_jump" and sprite.is_playing()
 
-	# 5. 移动与重力处理
+	# 5. 移动与重力处理 (参考左侧玩家逻辑修改)
 	if is_attacking and is_on_floor():
 		velocity.x = 0
 	elif not is_on_floor():
 		velocity += get_gravity() * delta
 		if is_attacking or is_air_attacking:
 			velocity.y *= 0.5
+			# 空中攻击时减缓惯性，但不完全卡死
 			velocity.x *= 0.5
 		was_in_air = true
 	else:
-		if was_in_air:
+		# 落地检测逻辑同步
+		if is_air_attacking:
+			if not has_attack_fired:
+				# 攻击未完成前落地，强制静止
+				velocity.x = 0 
+				velocity.y = 0
+			else:
+				# 已发射则执行正常落地
+				handle_landing_sequence()
+		elif was_in_air:
 			handle_landing_sequence()
 
-	# 6. 左右移动逻辑
+	# 6. 左右移动逻辑 (增加对空中攻击落地的限制)
 	var is_landing = sprite.animation == "onFloor" and sprite.is_playing()
 	var direction := Input.get_axis("Player_Right_left", "Player_Right_right")
 	
-	if not (is_attacking or is_landing):
-		if direction != 0:
-			velocity.x = direction * SPEED
-			sprite.flip_h = direction < 0
-		else:
-			velocity.x = move_toward(velocity.x, 0, SPEED)
+	if is_landing:
+		velocity.x = 0
+	else:
+		# 如果处于空中攻击落地且未发射状态，禁止移动输入
+		if not (is_on_floor() and is_air_attacking and not has_attack_fired):
+			if direction != 0:
+				velocity.x = direction * SPEED
+				sprite.flip_h = direction < 0
+			else:
+				velocity.x = move_toward(velocity.x, 0, SPEED)
 
 	# 7. 跳跃逻辑
-	if Input.is_action_just_pressed("Player_Right_jump") and not is_landing:
+	if Input.is_action_just_pressed("Player_Right_jump") and not is_landing and not is_air_attacking:
 		if is_on_floor() or jump_count < 2:
 			jump_real()
 
@@ -134,12 +148,12 @@ func check_attack_frames():
 			if sprite.frame >= 24 and not has_attack_fired:
 				shoot_logic()
 				has_attack_fired = true
-				sprite.speed_scale = 1.0 # 发射子弹后，恢复正常速度播放后摇
+				sprite.speed_scale = 1.0 
 		"attack_jump":
 			if sprite.frame >= 3 and not has_attack_fired:
 				shoot_logic()
 				has_attack_fired = true
-				sprite.speed_scale = 1.0 # 恢复正常速度
+				sprite.speed_scale = 1.0 
 		"sp_attack":
 			if sprite.frame >= 11 and not has_sp_attack_fired:
 				sp_shoot_logic()
@@ -150,11 +164,11 @@ func start_attack():
 	can_fire = false
 	energy -= 10
 	has_attack_fired = false 
-	# 加快前摇：将动画播放倍率设为 2.0
 	sprite.speed_scale = 2.0
 	
 	if not is_on_floor():
 		sprite.play("attack_jump")
+		velocity.y *= 0.5 # 启动空中攻击时悬停感
 	else:
 		sprite.play("attack")
 	$Timer/Fire_Colldown.start()
@@ -164,7 +178,7 @@ func trigger_special_shoot():
 	can_sp = false 
 	energy -= 30
 	has_sp_attack_fired = false
-	sprite.speed_scale = 1.0 # 确保特殊攻击速度正常
+	sprite.speed_scale = 1.0 
 	sprite.play("sp_attack")
 	
 	if not is_on_floor():
@@ -190,7 +204,6 @@ func sp_shoot_logic():
 	sp_fire.emit(marker.global_position, dirs)
 	spawn_effect()
 
-# 生成粒子
 func spawn_effect():
 	var effect = hit_particle_scene.instantiate()
 	effect.global_position = marker.global_position
@@ -218,8 +231,10 @@ func handle_animations(direction: float):
 		if sprite.is_playing():
 			return 
 		else:
-			sprite.speed_scale = 1.0 # 动画播放完毕强制重置速度倍率
+			sprite.speed_scale = 1.0 
 			if is_on_floor():
+				was_in_air = false # 确保重置空中状态
+				jump_count = 0
 				if currently_moving: sprite.play("run")
 				else: sprite.play("idle")
 			else:
