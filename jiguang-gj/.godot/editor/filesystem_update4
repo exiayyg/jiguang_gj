@@ -1,3 +1,16 @@
 res://Scenes/Characters/player_right.tscn
 res://Scripts/Characters/player_right.gd
 res://Scenes/Levels/test_level.tscn
+res://Scenes/Base/base_left.tscn
+res://Scripts/Base/base_left.gd
+res://Scenes/Base/base_right.tscn
+res://Scripts/Base/base_right.gd
+res://Scenes/Objects/energy.tscn
+res://Scripts/Objects/energy.gd
+res://Scenes/Objects/health.tscn
+res://Scripts/Objects/health.gd
+res://Scenes/Objects/particle2.tscn
+res://Scenes/Characters/Player_Left.tscn
+res://Scripts/Characters/player_left.gd
+res://Scenes/Bullets/left_bullet.tscn
+res://Scripts/Levels/test_level.gd

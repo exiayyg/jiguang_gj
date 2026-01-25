@@ -53,6 +53,7 @@ max_health = 300
 texture = ExtResource("1_l2djw")
 
 [node name="Timer" type="Timer" parent="."]
+wait_time = 3.0
 
 [node name="Marker2D" type="Marker2D" parent="."]
 position = Vector2(-1, -147)

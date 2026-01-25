@@ -1,7 +1,7 @@
 extends Node2D
 
 # --- 音乐循环逻辑 ---
-@onready var bgm_player: AudioStreamPlayer = $AudioStreamPlayer 
+@onready var bgm_player: AudioStreamPlayer = $AudioStreamPlayer2
 var is_looping: bool = false
 var loop_start_time: float = 2.44 
 
@@ -36,8 +36,8 @@ func _ready() -> void:
 	base_left.global_position = $Mark/base_left.global_position
 	base_right.global_position = $Mark/base_right.global_position
 	
-	if bgm_player:
-		bgm_player.play()
+	#if bgm_player:
+		#bgm_player.play()
 	
 	if not player_left.sp_fire.is_connected(_on_player_left_sp_fire):
 		player_left.sp_fire.connect(_on_player_left_sp_fire)
@@ -53,7 +53,7 @@ func _process(_delta: float) -> void:
 		#var stream_length = bgm_player.stream.get_length()
 		#if current_pos >= stream_length - 0.02:
 			#bgm_player.seek(loop_start_time)
-		$Node/AudioStreamPlayer2.play()
+	$Node/AudioStreamPlayer2.play()
 
 func _physics_process(_delta: float) -> void:
 	if can_create_object:

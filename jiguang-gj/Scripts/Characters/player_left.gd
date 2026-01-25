@@ -197,6 +197,10 @@ func sp_shoot_logic():
 	var base_dir = Vector2.LEFT if sprite.flip_h else Vector2.RIGHT
 	var dirs = [base_dir, base_dir.rotated(deg_to_rad(-10)), base_dir.rotated(deg_to_rad(10))]
 	sp_fire.emit(marker.global_position, dirs)
+	
+	var effect = hit_particle_scene.instantiate()
+	effect.global_position = marker.global_position
+	get_parent().add_child(effect)
 
 func jump_real():
 	velocity.y = JUMP_VELOCITY
