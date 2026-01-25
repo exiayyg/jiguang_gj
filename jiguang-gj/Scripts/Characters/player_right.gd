@@ -67,7 +67,7 @@ func _physics_process(delta: float) -> void:
 			velocity += get_gravity() * delta
 			velocity.y *= 0.5 
 		else:
-			velocity.x = 0
+			velocity.x = 0 # 地面释放特攻时强制静止
 		
 		check_attack_frames() 
 		move_and_slide()
@@ -86,46 +86,48 @@ func _physics_process(delta: float) -> void:
 	var is_attacking = sprite.animation == "attack" and sprite.is_playing()
 	var is_air_attacking = sprite.animation == "attack_jump" and sprite.is_playing()
 
-	# 5. 移动与重力处理 (参考左侧玩家逻辑修改)
+	# 5. 移动与重力处理
 	if is_attacking and is_on_floor():
-		velocity.x = 0
+		velocity.x = 0 # 核心修改：攻击时速度强制清零
 	elif not is_on_floor():
 		velocity += get_gravity() * delta
 		if is_attacking or is_air_attacking:
 			velocity.y *= 0.5
-			# 空中攻击时减缓惯性，但不完全卡死
 			velocity.x *= 0.5
 		was_in_air = true
 	else:
-		# 落地检测逻辑同步
 		if is_air_attacking:
 			if not has_attack_fired:
-				# 攻击未完成前落地，强制静止
 				velocity.x = 0 
 				velocity.y = 0
 			else:
-				# 已发射则执行正常落地
 				handle_landing_sequence()
 		elif was_in_air:
 			handle_landing_sequence()
 
-	# 6. 左右移动逻辑 (增加对空中攻击落地的限制)
+	# 6. 左右移动逻辑
 	var is_landing = sprite.animation == "onFloor" and sprite.is_playing()
 	var direction := Input.get_axis("Player_Right_left", "Player_Right_right")
 	
 	if is_landing:
 		velocity.x = 0
 	else:
-		# 如果处于空中攻击落地且未发射状态，禁止移动输入
-		if not (is_on_floor() and is_air_attacking and not has_attack_fired):
-			if direction != 0:
-				velocity.x = direction * SPEED
-				sprite.flip_h = direction < 0
-			else:
-				velocity.x = move_toward(velocity.x, 0, SPEED)
+		# 修改：如果正在地面攻击，即使有方向键输入也不更新速度和 flip_h
+		if not (is_on_floor() and (is_attacking or is_sp_attacking)):
+			# 同时也保留你之前的空中攻击限制逻辑
+			if not (is_on_floor() and is_air_attacking and not has_attack_fired):
+				if direction != 0:
+					velocity.x = direction * SPEED
+					sprite.flip_h = direction < 0
+				else:
+					velocity.x = move_toward(velocity.x, 0, SPEED)
+		else:
+			# 地面攻击状态下，确保速度保持为 0
+			velocity.x = 0
 
 	# 7. 跳跃逻辑
-	if Input.is_action_just_pressed("Player_Right_jump") and not is_landing and not is_air_attacking:
+	# 修改：攻击状态下通常禁止起跳，增加判断
+	if Input.is_action_just_pressed("Player_Right_jump") and not is_landing and not is_air_attacking and not is_attacking:
 		if is_on_floor() or jump_count < 2:
 			jump_real()
 
@@ -168,9 +170,10 @@ func start_attack():
 	
 	if not is_on_floor():
 		sprite.play("attack_jump")
-		velocity.y *= 0.5 # 启动空中攻击时悬停感
+		velocity.y *= 0.5 
 	else:
 		sprite.play("attack")
+		velocity.x = 0 # 启动瞬间立即静止
 	$Timer/Fire_Colldown.start()
 
 # 特殊攻击启动
@@ -184,6 +187,8 @@ func trigger_special_shoot():
 	if not is_on_floor():
 		velocity.y *= 0.5 
 		velocity.x = 0 
+	else:
+		velocity.x = 0
 	
 	$Timer/sp_Cooldown.start() 
 
@@ -233,7 +238,7 @@ func handle_animations(direction: float):
 		else:
 			sprite.speed_scale = 1.0 
 			if is_on_floor():
-				was_in_air = false # 确保重置空中状态
+				was_in_air = false 
 				jump_count = 0
 				if currently_moving: sprite.play("run")
 				else: sprite.play("idle")

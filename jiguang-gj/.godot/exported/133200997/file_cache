@@ -3,8 +3,8 @@ res://Scenes/Base/base_right.tscn::499ef0020bfe090564c57f2586d029cc::1769325094:
 res://Scenes/Bullets/left_bullet.tscn::f837fadd2cd2b082dad2386cf9aa9e5c::1769324612::res://.godot/exported/133200997/export-4ab7b92e1fd94e60964a4243a9fef348-left_bullet.scn
 res://Scenes/Bullets/right_bullet.tscn::1c2a8cddc3221c836bdc28e295587b29::1769276761::res://.godot/exported/133200997/export-e0e9aeb22c998bcb15e46e551eb7afaf-right_bullet.scn
 res://Scenes/Characters/Player_Left.tscn::6e0c314f2106c30482724ee3e357bb9e::1769324291::res://.godot/exported/133200997/export-dc12d70d85e58421b47019dc5714a541-Player_Left.scn
-res://Scenes/Characters/player_right.tscn::e9cf058cd1aabde66439523758d0b9e3::1769324808::res://.godot/exported/133200997/export-2bc3be6c6e095b081c3adb6f251cdcd3-player_right.scn
-res://Scenes/Levels/test_level.tscn::734f6aa16c5be8f1fbbee1dd94f6b3d2::1769325008::res://.godot/exported/133200997/export-d120ffbe0d0c37f3342ba06225cc60d9-test_level.scn
+res://Scenes/Characters/player_right.tscn::e9cf058cd1aabde66439523758d0b9e3::1769326178::res://.godot/exported/133200997/export-2bc3be6c6e095b081c3adb6f251cdcd3-player_right.scn
+res://Scenes/Levels/test_level.tscn::734f6aa16c5be8f1fbbee1dd94f6b3d2::1769326214::res://.godot/exported/133200997/export-d120ffbe0d0c37f3342ba06225cc60d9-test_level.scn
 res://Scenes/Objects/object.tscn::2ef70f744edc55cb72e9e802140ccddb::1769272010::res://.godot/exported/133200997/export-fa49789ea20f99063854536341bdc5db-object.scn
 res://Scenes/UI/game_evaluate.tscn::d137a9f9fa55002cce2b2fd4d9dc5b94::1769066267::res://.godot/exported/133200997/export-3f956ea065a5470ae001d1b5abfd5849-game_evaluate.scn
 res://Scenes/UI/game_start_screen.tscn::9accbdfc99ce0018af4d0947a83234a7::1769032280::res://.godot/exported/133200997/export-6851fd6a54dcd8b7e4472ec49d299897-game_start_screen.scn

@@ -36,9 +36,6 @@ func _ready() -> void:
 	base_left.global_position = $Mark/base_left.global_position
 	base_right.global_position = $Mark/base_right.global_position
 	
-	#if bgm_player:
-		#bgm_player.play()
-	
 	if not player_left.sp_fire.is_connected(_on_player_left_sp_fire):
 		player_left.sp_fire.connect(_on_player_left_sp_fire)
 	if not player_right.sp_fire.is_connected(_on_player_right_sp_fire):
@@ -48,28 +45,15 @@ func _ready() -> void:
 	player_right.fire.connect(_on_player_right_fire)
 
 func _process(_delta: float) -> void:
-	#if bgm_player and bgm_player.playing:
-		#var current_pos = bgm_player.get_playback_position()
-		#var stream_length = bgm_player.stream.get_length()
-		#if current_pos >= stream_length - 0.02:
-			#bgm_player.seek(loop_start_time)
-	$Node/AudioStreamPlayer2.play()
+	# 修复：原代码物理处理中有 play() 可能导致音效重叠，建议放在 ready 启动
+	# $Node/AudioStreamPlayer2.play() 
+	pass
 
 func _physics_process(_delta: float) -> void:
 	if can_create_object:
 		create_objects()
 		can_create_object = false
 		$Objects/Timer.start()
-	
-	#if die_time_left:
-		#player_left.hurt(5)
-		#die_time_left = false
-		#$Base/Left.start()
-		
-	#if die_time_right:
-		#player_right.hurt(5)
-		#die_time_right = false
-		#$Base/Right.start()
 
 func _on_player_left_sp_fire(fire_pos: Vector2, directions: Array) -> void:
 	for i in range(directions.size()):
@@ -117,27 +101,37 @@ func _on_right_bullet_rebound(pos: Vector2, dir: Vector2) -> void:
 	bullet.get_direction(dir)
 	bullet.rebound_bullet.connect(_on_left_bullet_rebound)
 
-# --- 修改后的生成逻辑 ---
+# --- 核心逻辑：掉落概率调整 ---
 func create_objects():
-	var random_range: Vector2 = Vector2(randf_range(340, 1580), -100)
-	var object: Node
+	var random_pos: Vector2 = Vector2(randf_range(340, 1580), -100)
+	var object: Node = null
 	
+	# 1. 双方基地都被摧毁：只掉落能量球
 	if left_base_die and right_base_die:
 		object = energy_ball_scene.instantiate()
+	
+	# 2. 仅有一方基地被摧毁：能量球掉落概率翻倍
+	elif left_base_die or right_base_die:
+		# 原概率：能量 1/4 (25%)，其他 3/4 (75%)
+		# 翻倍后：能量 2/5 (40%) 或者更简单的权重判断：
+		var rand_val = randi_range(0, 6) # 生成 0-4 (共5个数字)
+		match rand_val:
+			0, 1, 2, 3: object = energy_ball_scene.instantiate() # 2/5 概率 (40%)
+			4: object = guard_ball_scene.instantiate()
+			5: object = rebound_ball_scene.instantiate()
+			6: object = health_ball_scene.instantiate() if health_ball_scene else energy_ball_scene.instantiate()
+	
+	# 3. 双方基地都在：平均掉落
 	else:
-		var random_select = randi_range(0, 3) # 确保是 0, 1, 2, 3
+		var random_select = randi_range(0, 3) 
 		match random_select:
 			0: object = energy_ball_scene.instantiate()
 			1: object = guard_ball_scene.instantiate()
 			2: object = rebound_ball_scene.instantiate()
-			3: 
-				if health_ball_scene: # 安全检查
-					object = health_ball_scene.instantiate()
-				else:
-					object = energy_ball_scene.instantiate() # 备选方案
+			3: object = health_ball_scene.instantiate() if health_ball_scene else energy_ball_scene.instantiate()
 		
 	if object:
-		object.global_position = random_range
+		object.global_position = random_pos
 		$Objects.add_child(object)
 
 func GameEvaluate():
@@ -148,14 +142,13 @@ func _on_timer_timeout() -> void:
 
 func _on_base_left_left_base_died() -> void:
 	left_base_die = true
-	if right_base_die:
-		$Objects/Timer.wait_time = 2
+	# 基地摧毁时不仅概率改变，还可以加快掉落速度
+	$Objects/Timer.wait_time = 2.0 if right_base_die else 3.0
 	$Base/Left.start()
 
 func _on_base_right_right_base_died() -> void:
 	right_base_die = true
-	if left_base_die:
-		$Objects/Timer.wait_time = 2
+	$Objects/Timer.wait_time = 2.0 if left_base_die else 3.0
 	$Base/Right.start()
 
 func _on_left_timeout() -> void: 
